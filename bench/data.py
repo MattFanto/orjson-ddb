@@ -12,6 +12,9 @@ from ujson import loads as ujson_loads
 
 from orjson import dumps as _orjson_dumps
 from orjson import loads as orjson_loads
+from orjson_ddb import loads as orjson_ddb_loads
+from orjson_ddb import dumps as orjson_ddb_dumps
+from dynamodb_json import json_util as dynamodb_json_util
 
 # dumps wrappers that return UTF-8
 
@@ -39,16 +42,59 @@ def simplejson_dumps(obj):
 # Add new libraries here (pair of UTF-8 dumper, loader)
 libraries = {
     "orjson": (orjson_dumps, orjson_loads),
-    "ujson": (ujson_dumps, ujson_loads),
-    "json": (json_dumps, json_loads),
-    "rapidjson": (rapidjson_dumps, rapidjson_loads),
-    "simplejson": (simplejson_dumps, simplejson_loads),
+    "orjson_ddb": (orjson_ddb_dumps, orjson_ddb_loads),
+    # "ujson": (ujson_dumps, ujson_loads),
+    # "json": (json_dumps, json_loads),
+    # "rapidjson": (rapidjson_dumps, rapidjson_loads),
+    # "simplejson": (simplejson_dumps, simplejson_loads),
 }
 
 # Add new JSON files here (corresponding to ../data/*.json.xz)
 fixtures = [
     "canada.json",
-    "citm_catalog.json",
-    "github.json",
-    "twitter.json",
+    # "citm_catalog.json",
+    # "github.json",
+    # "twitter.json",
+]
+
+
+def orjons_loads_ddb(obj):
+    d = orjson_loads(obj)
+    return dynamodb_json_util.loads(d)
+    # d["vector"] = [float(x["N"]) for x in d["vector"]["L"]]
+    # return d
+
+
+def json_loads_ddb(obj):
+    d = json_loads(obj)
+    d["vector"] = json_loads(d["vector"]["L"])
+    return d
+
+
+def orjons_loads_ddb_string(obj):
+    d = orjson_loads(obj)
+    # d = dynamodb_json_util.loads(d)
+    d["pk"] = d["pk"]["S"]
+    d["sk"] = d["sk"]["S"]
+    d["vector"] = orjson_loads(d["vector"]["L"])
+    return d
+
+
+def json_loads_ddb_pre(obj):
+    import json
+    d = json.loads(obj)
+    d["vector"] = {"L": json.dumps([float(x["N"]) for x in d["vector"]["L"]])}
+    return json.dumps(d).encode("utf-8")
+
+
+ddb_libraries = {
+    # "my-naive-ddb-json": (orjson_dumps, loads_ddb_naive),
+    "my-ddb-json": (orjson_dumps, orjson_ddb_loads),
+    "orjson": (orjson_dumps, orjons_loads_ddb),
+    "orjson-string": (orjson_dumps, orjons_loads_ddb_string, json_loads_ddb_pre),
+    "json-string": (_json_dumps, json_loads_ddb, json_loads_ddb_pre)
+}
+
+ddb_fixtures = [
+    "ddb_vectors.json"
 ]
