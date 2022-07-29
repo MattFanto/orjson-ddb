@@ -10,6 +10,7 @@ use std::borrow::Cow;
 use std::os::raw::c_char;
 use std::ptr::null;
 use std::ptr::NonNull;
+use std::str::FromStr;
 
 const YYJSON_TYPE_MASK: u8 = 0x07;
 const YYJSON_SUBTYPE_MASK: u8 = 0x18;
@@ -168,7 +169,7 @@ fn parse_yy_array(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
         };
         for idx in 0..=len.saturating_sub(1) {
             let val = yyjson_arr_iter_next(&mut iter);
-            let each = parse_node(val);
+            let each = parse_ddb_node(val);
             ffi!(PyList_SET_ITEM(list, idx as isize, each.as_ptr()));
         }
         nonnull!(list)
@@ -193,7 +194,7 @@ fn parse_yy_object(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
             let key = yyjson_obj_iter_next(&mut iter);
             let val = yyjson_obj_iter_get_val(key);
             let key_str = str_from_slice!((*key).uni.str_ as *const u8, unsafe_yyjson_get_len(key));
-            let pyval = parse_node(val);
+            let pyval = parse_ddb_node(val);
             let pykey: *mut pyo3_ffi::PyObject;
             let pyhash: pyo3_ffi::Py_hash_t;
             if unlikely!(key_str.len() > 64) {
@@ -243,5 +244,47 @@ pub fn parse_node(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
         ElementType::False => parse_false(),
         ElementType::Array => parse_yy_array(elem),
         ElementType::Object => parse_yy_object(elem),
+    }
+}
+
+
+#[inline(never)]
+fn parse_ddb_node(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
+    unsafe {
+        let len = unsafe_yyjson_get_len(elem);
+        if len != 1 {
+            panic!("DDB node must be one element");
+        }
+        let mut iter = yyjson_obj_iter {
+            idx: 0,
+            max: len,
+            cur: unsafe_yyjson_get_first(elem),
+            obj: elem,
+        };
+        let key = yyjson_obj_iter_next(&mut iter);
+        let val = yyjson_obj_iter_get_val(key);
+        let key_str = str_from_slice!((*key).uni.str_ as *const u8, unsafe_yyjson_get_len(key));
+        match key_str {
+            "N" => {
+                let len = unsafe_yyjson_get_len(val);
+                let str = str_from_slice!(
+                    (*val).uni.str_ as *const u8,
+                    len
+                );
+                let value = serde_json::Number::from_str(str).unwrap();
+                if value.is_f64() {
+                    parse_f64(value.as_f64().unwrap())
+                } else if value.is_i64() {
+                    parse_i64(value.as_i64().unwrap())
+                } else if value.is_u64() {
+                    parse_u64(value.as_u64().unwrap())
+                } else {
+                    panic!("Invalid number type for value: {}", str)
+                }
+            }
+            _ => {
+                parse_node(val)
+            }
+        }
     }
 }
