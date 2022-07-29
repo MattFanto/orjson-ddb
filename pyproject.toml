@@ -1,5 +1,5 @@
 [project]
-name = "orjson"
+name = "orjson_ddb"
 repository = "https://github.com/ijl/orjson"
 
 [build-system]

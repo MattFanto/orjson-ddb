@@ -101,7 +101,7 @@ pub unsafe extern "C" fn orjson_init_exec(mptr: *mut PyObject) -> c_int {
         let func = PyCFunction_NewEx(
             Box::into_raw(Box::new(wrapped_dumps)),
             null_mut(),
-            PyUnicode_InternFromString("orjson\0".as_ptr() as *const c_char),
+            PyUnicode_InternFromString("orjson_ddb\0".as_ptr() as *const c_char),
         );
         add!(mptr, "dumps\0", func);
     }
@@ -118,7 +118,7 @@ pub unsafe extern "C" fn orjson_init_exec(mptr: *mut PyObject) -> c_int {
         let func = PyCFunction_NewEx(
             Box::into_raw(Box::new(wrapped_loads)),
             null_mut(),
-            PyUnicode_InternFromString("orjson\0".as_ptr() as *const c_char),
+            PyUnicode_InternFromString("orjson_ddb\0".as_ptr() as *const c_char),
         );
         add!(mptr, "loads\0", func);
     }
@@ -194,7 +194,7 @@ pub unsafe extern "C" fn orjson_init_exec(mptr: *mut PyObject) -> c_int {
 #[no_mangle]
 #[cold]
 #[cfg_attr(feature = "optimize", optimize(size))]
-pub unsafe extern "C" fn PyInit_orjson() -> *mut PyModuleDef {
+pub unsafe extern "C" fn PyInit_orjson_ddb() -> *mut PyModuleDef {
     let mod_slots: Box<[PyModuleDef_Slot; 2]> = Box::new([
         PyModuleDef_Slot {
             slot: Py_mod_exec,
@@ -208,7 +208,7 @@ pub unsafe extern "C" fn PyInit_orjson() -> *mut PyModuleDef {
 
     let init = Box::new(PyModuleDef {
         m_base: PyModuleDef_HEAD_INIT,
-        m_name: "orjson\0".as_ptr() as *const c_char,
+        m_name: "orjson_ddb\0".as_ptr() as *const c_char,
         m_doc: null(),
         m_size: 0,
         m_methods: null_mut(),
