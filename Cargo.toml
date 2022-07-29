@@ -1,6 +1,6 @@
 [package]
-name = "orjson"
-version = "3.7.11"
+name = "orjson_ddb"
+version = "3.7.8"
 authors = ["ijl <ijl@mailbox.org>"]
 description = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
 edition = "2021"
@@ -26,7 +26,7 @@ include = [
 ]
 
 [lib]
-name = "orjson"
+name = "orjson_ddb"
 crate-type = ["cdylib"]
 
 [package.metadata.maturin]
