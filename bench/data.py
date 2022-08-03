@@ -14,7 +14,7 @@ from orjson import dumps as _orjson_dumps
 from orjson import loads as orjson_loads
 from orjson_ddb import loads as orjson_ddb_loads
 from orjson_ddb import dumps as orjson_ddb_dumps
-from dynamodb_json import json_util as dynamodb_json_util
+from boto3.dynamodb.types import TypeDeserializer
 
 
 # dumps wrappers that return UTF-8
@@ -59,7 +59,7 @@ fixtures = [
 ]
 
 
-def loads_ddb(obj, loader=orjson_loads):
+def loads_ddb(obj, loader):
     d = loader(obj)
     # return dynamodb_json_util.loads(d)
     d["vector"] = [float(x["N"]) for x in d["vector"]["L"]]
@@ -76,14 +76,6 @@ def loads_ddb_string(obj, loader):
     return d
 
 
-def json_loads_ddb_string(obj):
-    return loads_ddb_string(obj, json_loads)
-
-
-def orjson_loads_ddb_string(obj):
-    return loads_ddb_string(obj, ujson_loads)
-
-
 def loads_ddb_string_pre(obj):
     import json
     d = json.loads(obj)
@@ -91,14 +83,28 @@ def loads_ddb_string_pre(obj):
     return json.dumps(d).encode("utf-8")
 
 
+def loads_ddb_boto3(obj, loader):
+    d = loader(obj)
+    deserializer = TypeDeserializer()
+    d["vector"] = [
+        float(deserializer.deserialize(x)) for x in
+        d["vector"]["L"]
+    ]
+    d["pk"] = d["pk"]["S"]
+    d["sk"] = d["sk"]["S"]
+    return d
+
+
 ddb_libraries = {
     "custom-ddb": (orjson_dumps, orjson_ddb_loads),
-    "orjson-ddb": (orjson_dumps, lambda x: loads_ddb(x, orjson_loads)),
-    "ujson-ddb": (orjson_dumps, lambda x: loads_ddb(x, ujson_loads)),
-    "json-dbb": (_json_dumps, lambda x: loads_ddb(x, json_loads)),
+    # "orjson-ddb": (orjson_dumps, lambda x: loads_ddb(x, orjson_loads)),
+    # "ujson-ddb": (orjson_dumps, lambda x: loads_ddb(x, ujson_loads)),
+    # "json-dbb": (_json_dumps, lambda x: loads_ddb(x, json_loads)),
     "orjson-string": (orjson_dumps, lambda x: loads_ddb_string(x, orjson_loads), loads_ddb_string_pre),
     "ujson-string": (orjson_dumps, lambda x: loads_ddb_string(x, ujson_loads), loads_ddb_string_pre),
     "json-string": (_json_dumps, lambda x: loads_ddb_string(x, json_loads), loads_ddb_string_pre),
+    # "boto3-json": (orjson_dumps, lambda x: loads_ddb_boto3(x, json_loads)),
+    # "boto3-ujson": (orjson_dumps, lambda x: loads_ddb_boto3(x, ujson_loads)),
 }
 
 ddb_fixtures = [
