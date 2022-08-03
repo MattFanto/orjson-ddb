@@ -111,7 +111,7 @@ pub fn deserialize_yyjson(
             Err(DeserializeError::from_yyjson(msg, err.pos as i64, data))
         } else {
             let root = yyjson_doc_get_root(doc);
-            let ret = parse_node(root);
+            let ret = parse_root(root);
             yyjson_doc_free(doc);
             Ok(ret)
         }
@@ -147,6 +147,43 @@ impl ElementType {
     }
 }
 
+
+/// Quick workaround to handle the root response, in particular the Items / Item
+/// field which needs to be deserialized as a Native DDB json.
+fn parse_root(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
+    unsafe {
+        let len = unsafe_yyjson_get_len(elem);
+        if len != 1 {
+            // TODO [PR] you need to support also responses like query
+            //  where Item / Items isn't the only top level.
+            panic!("DDB node must be one element");
+        }
+        let dict = ffi!(_PyDict_NewPresized(len as isize));
+        let mut iter = yyjson_obj_iter {
+            idx: 0,
+            max: len,
+            cur: unsafe_yyjson_get_first(elem),
+            obj: elem,
+        };
+        let key = yyjson_obj_iter_next(&mut iter);
+        let val = yyjson_obj_iter_get_val(key);
+        let key_str = str_from_slice!((*key).uni.str_ as *const u8, unsafe_yyjson_get_len(key));
+        let pyval = match key_str {
+            "Item" => {
+                parse_yy_object(val)
+            }
+            "Items" => {
+                parse_yy_array(val)
+            }
+            _ => {
+                panic!("Expected item or items");
+            }
+        };
+        set_item_in_dict(dict, key_str, pyval);
+        nonnull!(dict)
+    }
+}
+
 fn parse_yy_string(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
     nonnull!(unicode_from_str(str_from_slice!(
         (*elem).uni.str_ as *const u8,
@@ -176,6 +213,43 @@ fn parse_yy_array(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
     }
 }
 
+fn set_item_in_dict(dict: *mut pyo3_ffi::PyObject, key_str: &str, pyval: NonNull<pyo3_ffi::PyObject>) {
+    let pykey: *mut pyo3_ffi::PyObject;
+    let pyhash: pyo3_ffi::Py_hash_t;
+    if unlikely!(key_str.len() > 64) {
+        pykey = unicode_from_str(&key_str);
+        pyhash = hash_str(pykey);
+    } else {
+        let hash = cache_hash(key_str.as_bytes());
+        {
+            let map = unsafe {
+                KEY_MAP
+                    .get_mut()
+                    .unwrap_or_else(|| unsafe { std::hint::unreachable_unchecked() })
+            };
+            let entry = map.entry(&hash).or_insert_with(
+                || hash,
+                || {
+                    let pyob = unicode_from_str(&key_str);
+                    hash_str(pyob);
+                    CachedKey::new(pyob)
+                },
+            );
+            pykey = entry.get();
+            pyhash = unsafe { (*pykey.cast::<PyASCIIObject>()).hash }
+        }
+    };
+    let _ = ffi!(_PyDict_SetItem_KnownHash(
+                dict,
+                pykey,
+                pyval.as_ptr(),
+                pyhash
+            ));
+    ffi!(Py_DECREF(pykey));
+    ffi!(Py_DECREF(pyval.as_ptr()));
+}
+
+
 #[inline(never)]
 fn parse_yy_object(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
     unsafe {
@@ -195,6 +269,7 @@ fn parse_yy_object(elem: *mut yyjson_val) -> NonNull<pyo3_ffi::PyObject> {
             let val = yyjson_obj_iter_get_val(key);
             let key_str = str_from_slice!((*key).uni.str_ as *const u8, unsafe_yyjson_get_len(key));
             let pyval = parse_ddb_node(val);
+            // TODO [PR] use set item from above
             let pykey: *mut pyo3_ffi::PyObject;
             let pyhash: pyo3_ffi::Py_hash_t;
             if unlikely!(key_str.len() > 64) {
