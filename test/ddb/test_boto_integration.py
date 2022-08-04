@@ -77,6 +77,7 @@ def test_ddb_boto3_get_item(dynamodb_mocked, dynamo_table, put_item_in_ddb):
             Key={"pk": {"S": "pk1"}, "sk": {"S": "sk1"}}
         )
         assert resp["Item"] == ITEM
+        assert "ResponseMetadata" in resp
 
 
 def test_ddb_boto3_query_items(dynamodb_mocked, dynamo_table, put_item_in_ddb):
@@ -84,9 +85,13 @@ def test_ddb_boto3_query_items(dynamodb_mocked, dynamo_table, put_item_in_ddb):
     with json_ddb_parser():
         resp = dynamodb_client.query(
             TableName=TABLE_NAME,
-            KeyConditionExpression='sk = :sk',
+            KeyConditionExpression='pk = :pk',
             ExpressionAttributeValues={
-                ':sk': {'S': 'sk1'}
+                ':pk': {'S': 'pk1'}
             }
         )
-        assert resp["Item"] == ITEM
+        assert resp["Items"][0] == ITEM
+        assert len(resp["Items"]) == 1
+        assert resp["Count"] == 1
+        assert resp["ScannedCount"] == 2
+        assert "ResponseMetadata" in resp
