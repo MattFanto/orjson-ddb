@@ -7,3 +7,5 @@ pytz
 typing_extensions;python_version<"3.8"
 xxhash==1.4.3;sys_platform=="linux" and python_version<"3.9" # creates non-compact ASCII for test_str_ascii
 moto==3.0.5
+# to avoid having to change all test and reduce PR changes
+orjson
