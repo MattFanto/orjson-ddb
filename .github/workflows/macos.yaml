@@ -28,8 +28,6 @@ jobs:
         rust-toolchain: nightly-2022-07-26
         manylinux: off
         args: -i python${{ matrix.python-version }} --release --strip --out dist
-#    - run: pip install -U pip wheel twine maturin==0.13.1
-#    - run: maturin build --no-sdist --release --strip --manylinux off -i $pythonLocation/python --target x86_64-apple-darwin
     - run: pip install -r test/requirements.txt
     - run: pip install orjson_ddb --no-index --find-links dist/ --force-reinstall
     - run: python -m pytest -s -rxX -v test
