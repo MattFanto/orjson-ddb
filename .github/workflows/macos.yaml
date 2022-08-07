@@ -29,7 +29,7 @@ jobs:
         target: ${{ matrix.target }}
         rust-toolchain: nightly-2022-07-26
         manylinux: off
-        args: --release --strip --out dist
+        args: -i python${{ matrix.python-version }} --release --strip --out dist
 #    - run: pip install -U pip wheel twine maturin==0.13.1
 #    - run: maturin build --no-sdist --release --strip --manylinux off -i $pythonLocation/python --target x86_64-apple-darwin
     - run: pip install -r test/requirements.txt
