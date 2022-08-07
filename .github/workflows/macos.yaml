@@ -12,10 +12,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [
+        python-version: [3.7]
 #          { version: '3.7', abi: 'cp37-cp37m' },
 #          { version: '3.8', abi: 'cp38-cp38' },
-          { version: '3.9', abi: 'cp39-cp39' },
+#          { version: '3.9', abi: 'cp39-cp39' },
 #          { version: '3.10', abi: 'cp310-cp310' },
         ]
         target: [
@@ -27,7 +27,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - run: pip install -U pip wheel twine maturin==0.13.1
 #    - name: Build Wheels
 #      uses: messense/maturin-action@v1
 #      env:
@@ -38,6 +37,7 @@ jobs:
 #        rust-toolchain: nightly-2022-07-26
 #        manylinux: off
 #        args: -i python3.9 --release --strip --out dist
+    - run: pip install -U pip wheel twine maturin==0.13.1
     - run: pip install -r test/requirements.txt
     - run: maturin build --no-sdist --release --strip --manylinux off -i $pythonLocation/python --target x86_64-apple-darwin
     - run: pip install orjson_ddb --no-index --find-links dist/ --force-reinstall
