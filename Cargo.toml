@@ -1,8 +1,8 @@
 [package]
 name = "orjson_ddb"
-version = "3.7.8"
-authors = ["ijl <ijl@mailbox.org>"]
-description = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
+version = "0.1.0"
+authors = ["Mattia Fantoni <mattia.fantoni@gmail.com>"]
+description = "Fast Python ser/des for DynamoDB native JSON format"
 edition = "2021"
 resolver = "2"
 rust-version = "1.57"
@@ -10,7 +10,7 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/ijl/orjson"
 homepage = "https://github.com/ijl/orjson"
 readme = "README.md"
-keywords = ["fast", "json", "dataclass", "dataclasses", "datetime", "rfc", "8259", "3339"]
+keywords = ["fast", "json", "dynamodb", "aws", "boto3"]
 include = [
     "Cargo.toml",
     "CHANGELOG.md",
