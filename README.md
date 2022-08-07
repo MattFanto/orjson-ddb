@@ -1,9 +1,18 @@
-# orjson
+# orjson-ddb
 
-orjson is a fast, correct JSON library for Python. It
-[benchmarks](https://github.com/ijl/orjson#performance) as the fastest Python
-library for JSON and is more correct than the standard json library or other
-third-party libraries. It serializes
+orjson-ddb is a fast DynamoDB native JSON library for Python. 
+It is a fork/reboot of [orjson](https://github.com/ijl/orjson) (from which it inherits the [fast performance](https://github.com/ijl/orjson#performance)) 
+adapted to serialize and deserialize DDB native JSON format in Python.
+Compared to the classic [boto3](https://github.com/boto/boto3) DynamoDB deserialization, it deserializes DynamoDB response 40x faster.
+
+## Work in progress
+
+This library is work in progress, please don't use it yet.
+
+
+## TODO
+
+It serializes
 [dataclass](https://github.com/ijl/orjson#dataclass),
 [datetime](https://github.com/ijl/orjson#datetime),
 [numpy](https://github.com/ijl/orjson#numpy), and
