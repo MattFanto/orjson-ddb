@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict
 
-import orjson
+import orjson_ddb as orjson
 
 dirname = os.path.join(os.path.dirname(__file__), "../data")
 

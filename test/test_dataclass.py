@@ -8,7 +8,7 @@ from typing import ClassVar, Dict, Optional
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 
 class AnEnum(Enum):

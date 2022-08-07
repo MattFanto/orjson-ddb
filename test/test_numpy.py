@@ -3,7 +3,7 @@
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 try:
     import numpy

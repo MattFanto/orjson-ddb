@@ -1,6 +1,6 @@
 [project]
-name = "orjson"
-repository = "https://github.com/ijl/orjson"
+name = "orjson_ddb"
+repository = "https://github.com/MattFanto/orjson-ddb"
 
 [build-system]
 build-backend = "maturin"

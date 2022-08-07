@@ -1,0 +1,56 @@
+name: mac-os
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+        target: [x86_64]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Build Wheels
+      uses: messense/maturin-action@v1
+      with:
+        maturin-version: v0.13.1
+        target: ${{ matrix.target }}
+        rust-toolchain: nightly-2022-07-26
+        manylinux: off
+        args: -i python${{ matrix.python-version }} --release --strip --out dist
+    - run: pip install -r test/requirements.txt
+    - run: pip install orjson_ddb --no-index --find-links dist/ --force-reinstall
+    - run: python -m pytest -s -rxX -v test
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: dist
+
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+    if: "startsWith(github.ref, 'refs/tags/')"
+    needs: [ macos ]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: wheels
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - run: pip install "maturin>=0.13,<0.14"
+      - name: deploy
+        run: maturin upload --skip-existing --username "$MATURIN_USERNAME" *.whl
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

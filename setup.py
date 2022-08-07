@@ -3,6 +3,6 @@
 from setuptools import setup
 
 setup(
-    name="orjson",
-    url="https://github.com/ijl/orjson",
+    name="orjson_ddb",
+    url="https://github.com/MattFanto/orjson-ddb",
 )

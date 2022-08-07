@@ -17,7 +17,7 @@ except ImportError:
     psutil = None  # type: ignore
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 try:
     import numpy
