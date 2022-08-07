@@ -2,7 +2,7 @@ name: manylinux2014
 on:
   push:
     branches:
-      - 'tt'
+      - '*'
     tags:
       - '*'
 jobs:
