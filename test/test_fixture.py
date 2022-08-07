@@ -2,7 +2,7 @@
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 from .util import read_fixture_bytes, read_fixture_str
 

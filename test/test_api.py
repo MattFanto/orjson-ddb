@@ -7,7 +7,7 @@ import re
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 SIMPLE_TYPES = (1, 1.0, -1, None, "str", True, False)
 

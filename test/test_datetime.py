@@ -6,7 +6,7 @@ import sys
 import pytest
 from dateutil import tz
 
-import orjson
+import orjson_ddb as orjson
 
 try:
     import zoneinfo

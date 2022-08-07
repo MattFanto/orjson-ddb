@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import orjson
+import orjson_ddb as orjson
 
 try:
     from typing import TypedDict

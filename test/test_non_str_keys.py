@@ -6,7 +6,7 @@ import uuid
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 try:
     import pytz

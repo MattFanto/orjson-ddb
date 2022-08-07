@@ -5,7 +5,7 @@ import enum
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 
 class StrEnum(str, enum.Enum):

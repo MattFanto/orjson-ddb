@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 
 class TestUltraJSON:

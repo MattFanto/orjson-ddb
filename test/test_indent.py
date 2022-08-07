@@ -3,7 +3,7 @@
 import datetime
 import json
 
-import orjson
+import orjson_ddb as orjson
 
 from .util import read_fixture_obj
 

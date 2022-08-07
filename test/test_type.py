@@ -9,7 +9,7 @@ try:
 except ImportError:
     xxhash = None
 
-import orjson
+import orjson_ddb as orjson
 
 
 class TestType:
