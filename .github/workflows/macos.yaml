@@ -12,14 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
-#          { version: '3.7', abi: 'cp37-cp37m' },
-#          { version: '3.8', abi: 'cp38-cp38' },
-#          { version: '3.9', abi: 'cp39-cp39' },
-#          { version: '3.10', abi: 'cp310-cp310' },
-        target: [
-          x86_64,
-        ]
+        python-version: [3.7, 3.8, 3.9, 3.10]
+        target: [x86_64]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -35,7 +29,7 @@ jobs:
         target: ${{ matrix.target }}
         rust-toolchain: nightly-2022-07-26
         manylinux: off
-        args: -i $pythonLocation/python --release --strip --out dist
+        args: --release --strip --out dist
 #    - run: pip install -U pip wheel twine maturin==0.13.1
 #    - run: maturin build --no-sdist --release --strip --manylinux off -i $pythonLocation/python --target x86_64-apple-darwin
     - run: pip install -r test/requirements.txt
