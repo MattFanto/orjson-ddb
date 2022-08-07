@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import orjson
+import orjson_ddb
 
-orjson.JSONDecodeError(msg="the_msg", doc="the_doc", pos=1)
+orjson_ddb.JSONDecodeError(msg="the_msg", doc="the_doc", pos=1)

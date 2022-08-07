@@ -1,16 +1,16 @@
 [package]
 name = "orjson_ddb"
-version = "3.7.8"
-authors = ["ijl <ijl@mailbox.org>"]
-description = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
-edition = "2018"
+version = "0.1.0"
+authors = ["Mattia Fantoni <mattia.fantoni@gmail.com>"]
+description = "Fast Python ser/des for DynamoDB native JSON format"
+edition = "2021"
 resolver = "2"
-rust-version = "1.54"
+rust-version = "1.57"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/ijl/orjson"
-homepage = "https://github.com/ijl/orjson"
+repository = "https://github.com/MattFanto/orjson-ddb"
+homepage = "https://github.com/MattFanto/orjson-ddb"
 readme = "README.md"
-keywords = ["fast", "json", "dataclass", "dataclasses", "datetime", "rfc", "8259", "3339"]
+keywords = ["fast", "json", "dynamodb", "aws", "boto3"]
 include = [
     "Cargo.toml",
     "CHANGELOG.md",
@@ -72,16 +72,16 @@ associative-cache = { version = "1" }
 beef = { version = "0.5", default_features = false, features = ["impl_serde"] }
 bytecount = { version = "^0.6.2", default_features = false, features = ["runtime-dispatch-simd"] }
 chrono = { version = "0.4", default_features = false }
+compact_str = { version = "0.5", default_features = false, features = ["serde"] }
 encoding_rs = { version = "0.8", default_features = false }
-inlinable_string = { version = "0.1" }
 itoa = { version = "1", default_features = false }
 once_cell = { version = "1", default_features = false }
 pyo3-ffi = { version = "^0.16.5", default_features = false, features = ["extension-module"]}
 ryu = { version = "1", default_features = false }
 serde = { version = "1", default_features = false }
-serde_json = { version = "^1.0.68", default_features = false, features = ["std", "float_roundtrip"] }
+serde_json = { path = "include/json", default_features = false, features = ["std", "float_roundtrip"] }
 simdutf8 = { version = "0.1", default_features = false, features = ["std"] }
-smallvec = { version = "^1.8", default_features = false, features = ["union", "write"] }
+smallvec = { version = "^1.9", default_features = false, features = ["union", "write"] }
 
 [build-dependencies]
 cc = { version = "1" }

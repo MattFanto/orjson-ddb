@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from operator import itemgetter
 from threading import get_ident
 
-import orjson
+import orjson_ddb
 
 
 DATA = sorted(
@@ -37,7 +37,7 @@ sys.stdout.flush()
 
 def test_func(n):
     try:
-        assert sorted(orjson.loads(orjson.dumps(DATA)), key=itemgetter("id")) == DATA
+        assert sorted(orjson_ddb.loads(orjson_ddb.dumps(DATA)), key=itemgetter("id")) == DATA
     except Exception:
         STATUS = 1
         traceback.print_exc()
@@ -45,7 +45,7 @@ def test_func(n):
 
 
 with ThreadPoolExecutor(max_workers=4) as executor:
-    executor.map(test_func, range(200000), chunksize=1000)
+    executor.map(test_func, range(50000), chunksize=1000)
     executor.shutdown(wait=True)
 
 

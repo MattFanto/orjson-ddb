@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import json
-import unittest
 
 import pytest
 
-import orjson
+import orjson_ddb as orjson
 
 from .util import read_fixture_str
 
@@ -24,7 +23,7 @@ MULTILINE_EMOJI = """[
 """
 
 
-class JsonDecodeErrorTests(unittest.TestCase):
+class TestJsonDecodeError:
     def _get_error_infos(self, json_decode_error_exc_info):
         return {
             k: v

@@ -1,13 +1,13 @@
 [project]
 name = "orjson_ddb"
-repository = "https://github.com/ijl/orjson"
+repository = "https://github.com/MattFanto/orjson-ddb"
 
 [build-system]
 build-backend = "maturin"
 requires = ["maturin>=0.13,<0.14"]
 
 [tool.maturin]
-sdist-include = ["build.rs", "Cargo.lock", "include"]
+sdist-include = ["build.rs", "Cargo.lock", "include/**/*"]
 strip = true
 
 [tool.black]
