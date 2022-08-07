@@ -185,13 +185,13 @@ class TestApi:
         """
         orjson.dumps.__module__ is a str
         """
-        assert orjson.dumps.__module__ == "orjson"
+        assert orjson.dumps.__module__ == "orjson_ddb"
 
     def test_loads_module_str(self):
         """
         orjson.loads.__module__ is a str
         """
-        assert orjson.loads.__module__ == "orjson"
+        assert orjson.loads.__module__ == "orjson_ddb"
 
     def test_bytes_buffer(self):
         """
