@@ -2,7 +2,7 @@ name: manylinux_2_28
 on:
   push:
     branches:
-      - 'tt'
+      - '*'
     tags:
       - '*'
 jobs:

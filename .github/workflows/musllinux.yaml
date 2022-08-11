@@ -2,7 +2,7 @@ name: musllinux
 on:
   push:
     branches:
-      - 'tt'
+      - '*'
     tags:
       - '*'
 jobs:

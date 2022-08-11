@@ -2,7 +2,7 @@ name: linux-cross
 on:
   push:
     branches:
-      - 'tt'
+      - '*'
     tags:
       - '*'
 jobs:
