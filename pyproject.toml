@@ -14,4 +14,4 @@ strip = true
 [tool.black]
 line-length = 88
 target-version = ["py37"]
-include = ".pyi?$"
+include = "python/orjson_ddb/orjson_ddb.pyi?$"
