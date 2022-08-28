@@ -1,10 +1,11 @@
 name: linux-cross
 on:
+  pull_request:
+    branches: [ master ]
   push:
-    branches:
-      - '*'
     tags:
       - '*'
+
 jobs:
   linux-cross:
     runs-on: ubuntu-22.04

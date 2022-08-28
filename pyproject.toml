@@ -8,7 +8,7 @@ requires = ["maturin>=0.13,<0.14"]
 
 [tool.maturin]
 sdist-include = ["build.rs", "Cargo.lock", "include/**/*"]
-python-source = ["python"]
+python-source = "python"
 strip = true
 
 [tool.black]

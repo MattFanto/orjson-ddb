@@ -1,8 +1,8 @@
 name: windows
 on:
+  pull_request:
+    branches: [ master ]
   push:
-    branches:
-      - '*'
     tags:
       - '*'
 
