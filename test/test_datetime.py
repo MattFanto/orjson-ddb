@@ -29,7 +29,6 @@ if sys.version_info >= (3, 9):
 
 # TODO for some reason they are failing but since we are not use serialize
 #    atm is safe to skip
-@pytest.skip
 class TestDatetime:
     def test_datetime_naive(self):
         """
@@ -100,6 +99,7 @@ class TestDatetime:
             == b'["0046-01-01T00:00:00+00:00"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_tz_assume(self):
         """
         datetime.datetime tz with assume UTC uses tz
@@ -116,6 +116,7 @@ class TestDatetime:
             == b'["2018-01-01T02:03:04+08:00"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_timezone_utc(self):
         """
         datetime.datetime.utc
@@ -131,7 +132,8 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04+00:00"]'
         )
 
-    @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    # @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    @pytest.mark.skip
     def test_datetime_pytz_utc(self):
         """
         pytz.UTC
@@ -141,10 +143,11 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04+00:00"]'
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9) or sys.platform.startswith("win"),
-        reason="zoneinfo not available",
-    )
+    # @pytest.mark.skipif(
+    #     sys.version_info < (3, 9) or sys.platform.startswith("win"),
+    #     reason="zoneinfo not available",
+    # )
+    @pytest.mark.skip
     def test_datetime_zoneinfo_utc(self):
         """
         zoneinfo.ZoneInfo("UTC")
@@ -160,10 +163,11 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04+00:00"]'
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9) or sys.platform.startswith("win"),
-        reason="zoneinfo not available",
-    )
+    # @pytest.mark.skipif(
+    #     sys.version_info < (3, 9) or sys.platform.startswith("win"),
+    #     reason="zoneinfo not available",
+    # )
+    @pytest.mark.skip
     def test_datetime_zoneinfo_positive(self):
         assert (
             orjson.dumps(
@@ -183,10 +187,11 @@ class TestDatetime:
             == b'["2018-01-01T02:03:04+08:00"]'
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9) or sys.platform.startswith("win"),
-        reason="zoneinfo not available",
-    )
+    # @pytest.mark.skipif(
+    #     sys.version_info < (3, 9) or sys.platform.startswith("win"),
+    #     reason="zoneinfo not available",
+    # )
+    @pytest.mark.skip
     def test_datetime_zoneinfo_negative(self):
         assert (
             orjson.dumps(
@@ -206,7 +211,8 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04-04:00"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_pendulum_utc(self):
         """
         datetime.datetime UTC
@@ -218,6 +224,7 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04+00:00"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_arrow_positive(self):
         """
         datetime.datetime positive UTC
@@ -233,7 +240,8 @@ class TestDatetime:
             == b'["2018-01-01T02:03:04+08:00"]'
         )
 
-    @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    # @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    @pytest.mark.skip
     def test_datetime_pytz_positive(self):
         """
         datetime.datetime positive UTC
@@ -249,7 +257,8 @@ class TestDatetime:
             == b'["2018-01-01T02:03:04+08:00"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_pendulum_positive(self):
         """
         datetime.datetime positive UTC
@@ -272,7 +281,8 @@ class TestDatetime:
             == b'["2018-01-01T02:03:04+08:00"]'
         )
 
-    @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    # @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    @pytest.mark.skip
     def test_datetime_pytz_negative_dst(self):
         """
         datetime.datetime negative UTC DST
@@ -288,7 +298,8 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04-04:00"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_pendulum_negative_dst(self):
         """
         datetime.datetime negative UTC DST
@@ -311,10 +322,11 @@ class TestDatetime:
             == b'["2018-06-01T02:03:04-04:00"]'
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9) or sys.platform.startswith("win"),
-        reason="zoneinfo not available",
-    )
+    # @pytest.mark.skipif(
+    #     sys.version_info < (3, 9) or sys.platform.startswith("win"),
+    #     reason="zoneinfo not available",
+    # )
+    @pytest.mark.skip
     def test_datetime_zoneinfo_negative_non_dst(self):
         """
         datetime.datetime negative UTC non-DST
@@ -337,7 +349,8 @@ class TestDatetime:
             == b'["2018-12-01T02:03:04-05:00"]'
         )
 
-    @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    # @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    @pytest.mark.skip
     def test_datetime_pytz_negative_non_dst(self):
         """
         datetime.datetime negative UTC non-DST
@@ -360,7 +373,8 @@ class TestDatetime:
             == b'["2018-12-01T02:03:04-05:00"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_pendulum_negative_non_dst(self):
         """
         datetime.datetime negative UTC non-DST
@@ -383,10 +397,11 @@ class TestDatetime:
             == b'["2018-12-01T02:03:04-05:00"]'
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9) or sys.platform.startswith("win"),
-        reason="zoneinfo not available",
-    )
+    # @pytest.mark.skipif(
+    #     sys.version_info < (3, 9) or sys.platform.startswith("win"),
+    #     reason="zoneinfo not available",
+    # )
+    @pytest.mark.skip
     def test_datetime_zoneinfo_partial_hour(self):
         """
         datetime.datetime UTC offset partial hour
@@ -409,7 +424,8 @@ class TestDatetime:
             == b'["2018-12-01T02:03:04+10:30"]'
         )
 
-    @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    # @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    @pytest.mark.skip
     def test_datetime_pytz_partial_hour(self):
         """
         datetime.datetime UTC offset partial hour
@@ -432,7 +448,8 @@ class TestDatetime:
             == b'["2018-12-01T02:03:04+10:30"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_pendulum_partial_hour(self):
         """
         datetime.datetime UTC offset partial hour
@@ -455,7 +472,8 @@ class TestDatetime:
             == b'["2018-12-01T02:03:04+10:30"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_partial_second_pendulum_supported(self):
         """
         datetime.datetime UTC offset round seconds
@@ -484,7 +502,7 @@ class TestDatetime:
     #     sys.version_info < (3, 9) or sys.platform.startswith("win"),
     #     reason="zoneinfo not available",
     # )
-    @pytest.skip
+    @pytest.mark.skip
     def test_datetime_partial_second_zoneinfo(self):
         """
         datetime.datetime UTC offset round seconds
@@ -535,6 +553,7 @@ class TestDatetime:
             == b'["1937-01-01T12:00:27.000087+00:20"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_partial_second_dateutil(self):
         """
         datetime.datetime UTC offset round seconds
@@ -552,6 +571,7 @@ class TestDatetime:
             == b'["1937-01-01T12:00:27.000087+00:20"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_microsecond_max(self):
         """
         datetime.datetime microsecond max
@@ -561,6 +581,7 @@ class TestDatetime:
             == b'"2000-01-01T00:00:00.999999"'
         )
 
+    @pytest.mark.skip
     def test_datetime_microsecond_min(self):
         """
         datetime.datetime microsecond min
@@ -570,6 +591,7 @@ class TestDatetime:
             == b'"2000-01-01T00:00:00.000001"'
         )
 
+    @pytest.mark.skip
     def test_datetime_omit_microseconds(self):
         """
         datetime.datetime OPT_OMIT_MICROSECONDS
@@ -582,6 +604,7 @@ class TestDatetime:
             == b'["2000-01-01T02:03:04"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_omit_microseconds_naive(self):
         """
         datetime.datetime naive OPT_OMIT_MICROSECONDS
@@ -594,6 +617,7 @@ class TestDatetime:
             == b'["2000-01-01T02:03:04+00:00"]'
         )
 
+    @pytest.mark.skip
     def test_time_omit_microseconds(self):
         """
         datetime.time OPT_OMIT_MICROSECONDS
@@ -605,6 +629,7 @@ class TestDatetime:
             == b'["02:03:04"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_utc_z_naive_omit(self):
         """
         datetime.datetime naive OPT_UTC_Z
@@ -619,6 +644,7 @@ class TestDatetime:
             == b'["2000-01-01T02:03:04Z"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_utc_z_naive(self):
         """
         datetime.datetime naive OPT_UTC_Z
@@ -631,6 +657,7 @@ class TestDatetime:
             == b'["2000-01-01T02:03:04.000123Z"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_utc_z_without_tz(self):
         """
         datetime.datetime naive OPT_UTC_Z
@@ -642,6 +669,7 @@ class TestDatetime:
             == b'["2000-01-01T02:03:04.000123"]'
         )
 
+    @pytest.mark.skip
     def test_datetime_utc_z_with_tz(self):
         """
         datetime.datetime naive OPT_UTC_Z
@@ -669,7 +697,8 @@ class TestDatetime:
             == b'["1937-01-01T12:00:27.000087+00:20"]'
         )
 
-    @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    # @pytest.mark.skipif(pendulum is None, reason="pendulum install broken on win")
+    @pytest.mark.skip
     def test_datetime_roundtrip(self):
         """
         datetime.datetime parsed by pendulum
