@@ -50,6 +50,7 @@ classifiers = [
     "Programming Language :: Rust",
     "Typing :: Typed",
 ]
+python-source = "python"
 
 [features]
 default = []
