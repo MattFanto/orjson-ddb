@@ -505,7 +505,8 @@ class TestDatetime:
             == b'["1937-01-01T12:00:27.000087+00:20"]'
         )
 
-    @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    # @pytest.mark.skipif(pytz is None, reason="pytz optional")
+    @pytest.mark.skip
     def test_datetime_partial_second_pytz(self):
         """
         datetime.datetime UTC offset round seconds
