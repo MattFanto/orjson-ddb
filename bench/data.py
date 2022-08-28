@@ -12,10 +12,6 @@ from ujson import loads as ujson_loads
 
 from orjson import dumps as _orjson_dumps
 from orjson import loads as orjson_loads
-from orjson_ddb import loads as orjson_ddb_loads
-from orjson_ddb import dumps as orjson_ddb_dumps
-from boto3.dynamodb.types import TypeDeserializer
-
 
 # dumps wrappers that return UTF-8
 
@@ -43,70 +39,16 @@ def simplejson_dumps(obj):
 # Add new libraries here (pair of UTF-8 dumper, loader)
 libraries = {
     "orjson": (orjson_dumps, orjson_loads),
-    "orjson_ddb": (orjson_ddb_dumps, orjson_ddb_loads),
-    # "ujson": (ujson_dumps, ujson_loads),
-    # "json": (json_dumps, json_loads),
-    # "rapidjson": (rapidjson_dumps, rapidjson_loads),
-    # "simplejson": (simplejson_dumps, simplejson_loads),
+    "ujson": (ujson_dumps, ujson_loads),
+    "json": (json_dumps, json_loads),
+    "rapidjson": (rapidjson_dumps, rapidjson_loads),
+    "simplejson": (simplejson_dumps, simplejson_loads),
 }
 
 # Add new JSON files here (corresponding to ../data/*.json.xz)
 fixtures = [
     "canada.json",
-    # "citm_catalog.json",
-    # "github.json",
-    # "twitter.json",
-]
-
-
-def loads_ddb(obj, loader):
-    d = loader(obj)
-    # return dynamodb_json_util.loads(d)
-    d["vector"] = [float(x["N"]) for x in d["vector"]["L"]]
-    d["pk"] = d["pk"]["S"]
-    d["sk"] = d["sk"]["S"]
-    return d
-
-
-def loads_ddb_string(obj, loader):
-    d = loader(obj)
-    d["vector"] = loader(d["vector"]["S"])
-    d["pk"] = d["pk"]["S"]
-    d["sk"] = d["sk"]["S"]
-    return d
-
-
-def loads_ddb_string_pre(obj):
-    import json
-    d = json.loads(obj)
-    d["vector"] = {"S": json.dumps([float(x["N"]) for x in d["vector"]["L"]])}
-    return json.dumps(d).encode("utf-8")
-
-
-def loads_ddb_boto3(obj, loader):
-    d = loader(obj)
-    deserializer = TypeDeserializer()
-    d["vector"] = [
-        float(deserializer.deserialize(x)) for x in
-        d["vector"]["L"]
-    ]
-    d["pk"] = d["pk"]["S"]
-    d["sk"] = d["sk"]["S"]
-    return d
-
-
-ddb_libraries = {
-    "custom-ddb": (orjson_dumps, orjson_ddb_loads),
-    # "orjson-ddb": (orjson_dumps, lambda x: loads_ddb(x, orjson_loads)),
-    # "ujson-ddb": (orjson_dumps, lambda x: loads_ddb(x, ujson_loads)),
-    # "json-dbb": (_json_dumps, lambda x: loads_ddb(x, json_loads)),
-    "orjson-string": (orjson_dumps, lambda x: loads_ddb_string(x, orjson_loads), loads_ddb_string_pre),
-    "ujson-string": (orjson_dumps, lambda x: loads_ddb_string(x, ujson_loads), loads_ddb_string_pre),
-    "json-string": (_json_dumps, lambda x: loads_ddb_string(x, json_loads), loads_ddb_string_pre),
-    # "boto3-json": (orjson_dumps, lambda x: loads_ddb_boto3(x, json_loads)),
-    # "boto3-ujson": (orjson_dumps, lambda x: loads_ddb_boto3(x, ujson_loads)),
-}
-
-ddb_fixtures = [
-    "ddb_vectors.json"
+    "citm_catalog.json",
+    "github.json",
+    "twitter.json",
 ]

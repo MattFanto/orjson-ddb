@@ -1,26 +1,34 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
-
-from json import loads as json_loads
+import json
+from decimal import Decimal
+from boto3.dynamodb.types import TypeSerializer
 
 import pytest
 
-from .data import ddb_fixtures, ddb_libraries
+from .ddb_data import fixtures, libraries
 from .util import read_fixture
 
 
-@pytest.mark.parametrize("fixture", ddb_fixtures)
-@pytest.mark.parametrize("library", ddb_libraries)
+def convert_to_ddb(data):
+    """
+    Convert the fixture data to DynamoDB native format
+    :param data:
+    :return:
+    """
+    type_ser = TypeSerializer()
+    res = {}
+    # float are not supported https://github.com/boto/boto3/issues/665
+    data = json.loads(data, parse_float=Decimal)
+    for k, v in data.items():
+        res[k] = type_ser.serialize(v)
+    return json.dumps(res)
+
+
+@pytest.mark.parametrize("fixture", fixtures)
+@pytest.mark.parametrize("library", libraries)
 def test_loads(benchmark, fixture, library):
-    lib = ddb_libraries[library]
-    dumper = lib[0]
-    loader = lib[1]
+    dumper, loader = libraries[library]
     benchmark.group = f"{fixture} deserialization"
     benchmark.extra_info["lib"] = library
-    data = read_fixture(f"{fixture}.xz")
-    if len(lib) == 3:
-        data = lib[2](data)
-    benchmark.extra_info["correct"] = json_loads(dumper(loader(data))) == json_loads(
-        data
-    )
+    data = convert_to_ddb(read_fixture(f"{fixture}.xz"))
     benchmark(loader, data)
-    print(loader(data))
