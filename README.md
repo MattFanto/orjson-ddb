@@ -79,7 +79,7 @@ The output dictionary doesn't contain any reference to the DynamoDB Native forma
 what you would get with `boto3.resource('dynamodb').Table('some_table').get_item(Key={"pk": "pk1", "sk": "sk1"})["Item"]`
 except for "N" type being translated directly to int or float instead of Decimal.
 
-N.B. Unfortunately at the moment it is not possible to use the `boto3.resource`.
+N.B. Unfortunately at the moment it is not possible to use this library with `boto3.resource`.
 
 
 ### Serialize
