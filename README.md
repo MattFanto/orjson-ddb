@@ -8,21 +8,19 @@ it deserializes DynamoDB response 10x faster and deserialize float numbers (e.g.
 
 orjson-ddb supports CPython 3.7, 3.8, 3.9, 3.10, and 3.11. It distributes x86_64/amd64,
 aarch64/armv8, and arm7 wheels for Linux, amd64 and aarch64 wheels for macOS,
-and amd64 wheels for Windows. orjson does not support PyPy. Releases
+and amd64 wheels for Windows. orjson-ddb does not support PyPy. Releases
 follow semantic versioning and serializing a new object type
 without an opt-in flag is considered a breaking change.
 
-orjson is licensed under both the Apache 2.0 and MIT licenses. The
-repository and issue tracker is
-[github.com/MattFanto/orjson-ddb](https://github.com/MattFanto/orjson-ddb), and patches may be
-submitted there. There is a
-[CHANGELOG](https://github.com/MattFanto/orjson-ddb/blob/master/CHANGELOG.md)
+The repository and issue tracker is [github.com/MattFanto/orjson-ddb](https://github.com/MattFanto/orjson-ddb), 
+and patches may be submitted there. There is a [CHANGELOG](https://github.com/MattFanto/orjson-ddb/blob/master/CHANGELOG.md)
 available in the repository.
 
 1. [Usage](https://github.com/MattFanto/orjson-ddb#usage)
     1. [Install](https://github.com/MattFanto/orjson-ddb#install)
     2. [Quickstart](https://github.com/MattFanto/orjson-ddb#quickstart)
     3. [Deserialize](https://github.com/MattFanto/orjson-ddb#deserialize)
+    4. [Serialize](https://github.com/MattFanto/orjson-ddb#serialize)
 2. [Testing](https://github.com/MattFanto/orjson-ddb#testing)
 3. [Performance](https://github.com/MattFanto/orjson-ddb#performance)
     1. [Latency](https://github.com/MattFanto/orjson-ddb#latency)
@@ -45,7 +43,7 @@ pip install --upgrade orjson-ddb
 
 To build a wheel, see [packaging](https://github.com/MattFanto/orjson-ddb#packaging).
 
-### Quickstart
+### Deserialize
 
 This library exposes a function `loads` which can deserializer DynamoDB response into a Python dictionary.
 This can be used to parse the API response from DynamoDB, as an example if you are using the REST API:
@@ -84,9 +82,14 @@ except for "N" type being translated directly to int or float instead of Decimal
 N.B. Unfortunately at the moment it is not possible to use the `boto3.resource`.
 
 
+### Serialize
+
+Serialization of python dictionary to DynamoDB Native JSON format is not available yet.
+
+
 ## Performance
 
-Deserialization performance of orjson is better than
+Deserialization performance of orjson-ddb is better than
 boto3, dynamodb-json-util. The benchmarks are done on
 fixtures of real data converted to DynamoDB native format:
 
@@ -156,7 +159,7 @@ Probably not.
 
 ## Packaging
 
-To package orjson requires at least [Rust](https://www.rust-lang.org/) 1.57
+To package orjson-ddb requires at least [Rust](https://www.rust-lang.org/) 1.57
 and the [maturin](https://github.com/PyO3/maturin) build tool. The recommended
 build command is:
 
@@ -172,13 +175,13 @@ The project's own CI tests against `nightly-2022-07-26` and stable 1.54. It
 is prudent to pin the nightly version because that channel can introduce
 breaking changes.
 
-orjson is tested for amd64, aarch64, and arm7 on Linux. It is tested for
+orjson-ddb is tested for amd64, aarch64, and arm7 on Linux. It is tested for
 amd64 on macOS and cross-compiles for aarch64. For Windows it is tested on
 amd64.
 
 There are no runtime dependencies other than libc.
 
-orjson's tests are included in the source distribution on PyPI. The
+Tests are included in the source distribution on PyPI. The
 requirements to run the tests are specified in `test/requirements.txt`. The
 tests should be run as part of the build. It can be run with
 `pytest -q test`.
