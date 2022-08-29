@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+### Added
+
+- boto3 integration with ddb_json_parse context manager
+
 ## 0.1.1
 
 ### Changed
