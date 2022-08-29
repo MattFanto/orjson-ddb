@@ -1,10 +1,11 @@
 name: manylinux2014
 on:
+  pull_request:
+    branches: [ master ]
   push:
-    branches:
-      - '*'
     tags:
       - '*'
+
 jobs:
   manylinux2014:
     runs-on: ubuntu-22.04
