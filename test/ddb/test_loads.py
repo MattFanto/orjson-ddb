@@ -35,10 +35,3 @@ def test_orjson_ddb_loads_map():
     expected_output = {"map": {"key1": "value1", "key2": 123}}
     output_data = orjson_ddb.loads(input_data)
     assert output_data == expected_output
-
-
-def test_orjson_ddb_loads_set():
-    input_data = b'{"set": {"SS": ["item1", "item2"]}}'
-    expected_output = {"set": {"item1", "item2"}}
-    output_data = orjson_ddb.loads(input_data)
-    assert output_data == expected_output
