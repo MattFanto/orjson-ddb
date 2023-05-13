@@ -1,4 +1,3 @@
-import contextlib
 from decimal import Decimal
 
 import pytest
@@ -14,6 +13,7 @@ ITEM = {
     'sk': 'sk1',
     'vector': [1.0] * 512
 }
+
 
 @pytest.fixture
 def dynamodb_mocked():
