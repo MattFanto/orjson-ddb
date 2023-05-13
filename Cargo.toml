@@ -1,6 +1,6 @@
 [package]
 name = "orjson_ddb"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Mattia Fantoni <mattia.fantoni@gmail.com>"]
 description = "Fast Python ser/des for DynamoDB native JSON format"
 edition = "2021"

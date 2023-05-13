@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Fixed
+
+- Deserialization of "NULL" DynamoDB type
+
 ## 0.2.0
 
 ### Added
