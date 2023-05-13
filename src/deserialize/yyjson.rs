@@ -268,6 +268,9 @@ fn parse_ddb_node(key_str: &str, val: *mut yyjson_val) -> NonNull<pyo3_ffi::PyOb
                 panic!("Invalid number type for value: {}", str)
             }
         }
+        "NULL" => {
+            parse_none()
+        }
         "NS" | "SS" | "BS" => {
             // TODO [PR] requires special treatment for NS, SS, and co.
             panic!("DDB type {} not implemented yet", key_str)
