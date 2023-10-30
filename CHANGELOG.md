@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+
+### Added
+
+- Support for Python3.11 on Windows and Macos
+- Optional dependencies for boto
+
 ## 0.2.1
 
 ### Fixed
