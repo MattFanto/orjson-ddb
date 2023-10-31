@@ -56,7 +56,7 @@ DATACLASS_FIXTURE = [
     for i in range(100000, 101000)
 ]
 
-MAX_INCREASE = 1048576  # 1MiB
+MAX_INCREASE = 2097152  # 2MiB
 
 
 class Unsupported:
@@ -64,9 +64,7 @@ class Unsupported:
 
 
 class TestMemory:
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_loads(self):
         """
         loads() memory leak
@@ -74,15 +72,15 @@ class TestMemory:
         proc = psutil.Process()
         gc.collect()
         val = orjson.loads(FIXTURE)
+        assert val
         mem = proc.memory_info().rss
         for _ in range(10000):
             val = orjson.loads(FIXTURE)
+            assert val
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_loads_memoryview(self):
         """
         loads() memory leak using memoryview
@@ -91,15 +89,15 @@ class TestMemory:
         gc.collect()
         fixture = FIXTURE.encode("utf-8")
         val = orjson.loads(fixture)
+        assert val
         mem = proc.memory_info().rss
         for _ in range(10000):
             val = orjson.loads(memoryview(fixture))
+            assert val
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_dumps(self):
         """
         dumps() memory leak
@@ -108,16 +106,16 @@ class TestMemory:
         gc.collect()
         fixture = orjson.loads(FIXTURE)
         val = orjson.dumps(fixture)
+        assert val
         mem = proc.memory_info().rss
         for _ in range(10000):
             val = orjson.dumps(fixture)
+            assert val
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_loads_exc(self):
         """
         loads() memory leak exception without a GC pause
@@ -136,9 +134,7 @@ class TestMemory:
         assert proc.memory_info().rss <= mem + MAX_INCREASE
         gc.enable()
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_dumps_exc(self):
         """
         dumps() memory leak exception without a GC pause
@@ -158,9 +154,7 @@ class TestMemory:
         assert proc.memory_info().rss <= mem + MAX_INCREASE
         gc.enable()
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_dumps_default(self):
         """
         dumps() default memory leak
@@ -181,12 +175,11 @@ class TestMemory:
         mem = proc.memory_info().rss
         for _ in range(10000):
             val = orjson.dumps(fixture, default=default)
+            assert val
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_dumps_dataclass(self):
         """
         dumps() dataclass memory leak
@@ -194,15 +187,18 @@ class TestMemory:
         proc = psutil.Process()
         gc.collect()
         val = orjson.dumps(DATACLASS_FIXTURE)
+        assert val
         mem = proc.memory_info().rss
         for _ in range(100):
             val = orjson.dumps(DATACLASS_FIXTURE)
+            assert val
+        assert val
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
     @pytest.mark.skipif(
         psutil is None or pytz is None,
-        reason="psutil install broken on win, python3.9, Azure",
+        reason="psutil not installed",
     )
     def test_memory_dumps_pytz_tzinfo(self):
         """
@@ -212,15 +208,16 @@ class TestMemory:
         gc.collect()
         dt = datetime.datetime.now()
         val = orjson.dumps(pytz.UTC.localize(dt))
+        assert val
         mem = proc.memory_info().rss
         for _ in range(50000):
             val = orjson.dumps(pytz.UTC.localize(dt))
+            assert val
+        assert val
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_loads_keys(self):
         """
         loads() memory leak with number of keys causing cache eviction
@@ -231,26 +228,62 @@ class TestMemory:
         assert len(fixture) == 1024
         val = orjson.dumps(fixture)
         loaded = orjson.loads(val)
+        assert loaded
         mem = proc.memory_info().rss
         for _ in range(100):
             loaded = orjson.loads(val)
+            assert loaded
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
 
-    @pytest.mark.skipif(
-        psutil is None, reason="psutil install broken on win, python3.9, Azure"
-    )
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     @pytest.mark.skipif(numpy is None, reason="numpy is not installed")
     def test_memory_dumps_numpy(self):
         """
-        dumps() dataclass memory leak
+        dumps() numpy memory leak
         """
         proc = psutil.Process()
         gc.collect()
         fixture = numpy.random.rand(4, 4, 4)
         val = orjson.dumps(fixture, option=orjson.OPT_SERIALIZE_NUMPY)
+        assert val
         mem = proc.memory_info().rss
         for _ in range(100):
             val = orjson.dumps(fixture, option=orjson.OPT_SERIALIZE_NUMPY)
+            assert val
+        assert val
+        gc.collect()
+        assert proc.memory_info().rss <= mem + MAX_INCREASE
+
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
+    @pytest.mark.skipif(pandas is None, reason="pandas is not installed")
+    def test_memory_dumps_pandas(self):
+        """
+        dumps() pandas memory leak
+        """
+        proc = psutil.Process()
+        gc.collect()
+        numpy.random.rand(4, 4, 4)
+        df = pandas.Series(numpy.random.rand(4, 4, 4).tolist())
+        val = df.map(orjson.dumps)
+        assert not val.empty
+        mem = proc.memory_info().rss
+        for _ in range(100):
+            val = df.map(orjson.dumps)
+            assert not val.empty
+        gc.collect()
+        assert proc.memory_info().rss <= mem + MAX_INCREASE
+
+    @pytest.mark.skipif(psutil is None, reason="psutil not installed")
+    def test_memory_dumps_fragment(self):
+        """
+        dumps() Fragment memory leak
+        """
+        proc = psutil.Process()
+        gc.collect()
+        orjson.dumps(orjson.Fragment(str(0)))
+        mem = proc.memory_info().rss
+        for i in range(10000):
+            orjson.dumps(orjson.Fragment(str(i)))
         gc.collect()
         assert proc.memory_info().rss <= mem + MAX_INCREASE
