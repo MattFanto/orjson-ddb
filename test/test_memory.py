@@ -24,6 +24,11 @@ try:
 except ImportError:
     numpy = None  # type: ignore
 
+try:
+    import pandas
+except ImportError:
+    pandas = None  # type: ignore
+
 FIXTURE = '{"a":[81891289, 8919812.190129012], "b": false, "c": null, "d": "東京"}'
 
 
