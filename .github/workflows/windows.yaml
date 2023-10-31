@@ -15,17 +15,20 @@ jobs:
         target: [x64, x86]
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.target }}
+
       - name: Build wheels
         uses: messense/maturin-action@v1
         with:
-          maturin-version: v0.13.1
+          maturin-version: v1.3.1
           target: ${{ matrix.target }}
-          rust-toolchain: nightly-2022-07-26
+          rust-toolchain: nightly-2023-10-10
           args: --release --out dist
+
       - name: Install built wheel
         run: |
           pip install -r test/requirements.txt
@@ -46,10 +49,12 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: wheels
+
       - uses: actions/setup-python@v2
         with:
           python-version: "3.10"
-      - run: pip install "maturin>=0.13,<0.14"
+      - run: pip install "maturin>=1,<2"
+
       - name: deploy
         run: maturin upload --skip-existing --username "$MATURIN_USERNAME" *.whl
         env:

@@ -29,7 +29,7 @@ jobs:
 
     - run: maturin sdist --out=dist
 
-    - run: python3 -m pip install --user dist/orjson_ddb*.tar.gz
+    - run: python3 -m pip install --user dist/orjson*.tar.gz
       env:
         CARGO_NET_OFFLINE: "true"
 
@@ -93,7 +93,7 @@ jobs:
           --compatibility manylinux_2_17 \
           --interpreter python${{ matrix.python.version }} \
           --target=x86_64-unknown-linux-gnu
-    - run: python3 -m pip install --user dist/orjson_ddb*.whl
+    - run: python3 -m pip install --user dist/orjson*.whl
     - run: python3 -m pip install --user -r test/requirements.txt -r integration/requirements.txt
 
     - run: pytest -s -rxX -v test
@@ -202,21 +202,21 @@ jobs:
             target: 'aarch64-unknown-linux-gnu',
             cflags: '-O2',
           },
-          {
-            arch: 'armv7',
-            target: 'armv7-unknown-linux-gnueabihf',
-            cflags: '-Os -fstrict-aliasing',
-          },
-          {
-            arch: 'ppc64le',
-            target: 'powerpc64le-unknown-linux-gnu',
-            cflags: '-O2',
-          },
-          {
-            arch: 's390x',
-            target: 's390x-unknown-linux-gnu',
-            cflags: '-O2 -march=z10',
-          },
+#          {
+#            arch: 'armv7',
+#            target: 'armv7-unknown-linux-gnueabihf',
+#            cflags: '-Os -fstrict-aliasing',
+#          },
+#          {
+#            arch: 'ppc64le',
+#            target: 'powerpc64le-unknown-linux-gnu',
+#            cflags: '-O2',
+#          },
+#          {
+#            arch: 's390x',
+#            target: 's390x-unknown-linux-gnu',
+#            cflags: '-O2 -march=z10',
+#          },
         ]
     steps:
     - uses: actions/checkout@v4
