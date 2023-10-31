@@ -2,7 +2,7 @@
 
 use crate::deserialize::pyobject::*;
 use crate::deserialize::DeserializeError;
-use crate::unicode::*;
+use crate::str::*;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use smallvec::SmallVec;
 use std::borrow::Cow;
@@ -126,17 +126,18 @@ impl<'de> Visitor<'de> for JsonValue {
     {
         let dict_ptr = ffi!(PyDict_New());
         while let Some(key) = map.next_key::<beef::lean::Cow<str>>()? {
-            let (pykey, pyhash) = get_unicode_key(&key);
-            let value = map.next_value_seed(self)?;
-            let _ = ffi!(_PyDict_SetItem_KnownHash(
-                dict_ptr,
-                pykey,
-                value.as_ptr(),
-                pyhash
-            ));
-            // counter Py_INCREF in insertdict
-            ffi!(Py_DECREF(pykey));
-            ffi!(Py_DECREF(value.as_ptr()));
+            let pykey = get_unicode_key(&key);
+            let pyval = map.next_value_seed(self)?;
+            let _ = unsafe {
+                pyo3_ffi::_PyDict_SetItem_KnownHash(
+                    dict_ptr,
+                    pykey,
+                    pyval.as_ptr(),
+                    str_hash!(pykey),
+                )
+            };
+            reverse_pydict_incref!(pykey);
+            reverse_pydict_incref!(pyval.as_ptr());
         }
         Ok(nonnull!(dict_ptr))
     }

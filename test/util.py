@@ -16,10 +16,9 @@ OBJ_CACHE: Dict[str, Any] = {}
 
 def read_fixture_bytes(filename, subdir=None):
     if subdir is None:
-        parts = (dirname, filename)
+        path = Path(dirname, filename)
     else:
-        parts = (dirname, subdir, filename)
-    path = Path(*parts)
+        path = Path(dirname, subdir, filename)
     if path.suffix == ".xz":
         contents = lzma.decompress(path.read_bytes())
     else:
@@ -28,12 +27,12 @@ def read_fixture_bytes(filename, subdir=None):
 
 
 def read_fixture_str(filename, subdir=None):
-    if not filename in STR_CACHE:
+    if filename not in STR_CACHE:
         STR_CACHE[filename] = read_fixture_bytes(filename, subdir).decode("utf-8")
     return STR_CACHE[filename]
 
 
 def read_fixture_obj(filename):
-    if not filename in OBJ_CACHE:
+    if filename not in OBJ_CACHE:
         OBJ_CACHE[filename] = orjson.loads(read_fixture_str(filename))
     return OBJ_CACHE[filename]

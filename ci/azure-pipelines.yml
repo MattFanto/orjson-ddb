@@ -1,38 +1,44 @@
 variables:
-  toolchain: nightly-2022-07-26
+  toolchain: nightly-2023-10-10
 
 jobs:
 
-- job: linux_sdist_stable
+- job: macos_python312_univeral2
   pool:
-    vmImage: ubuntu-22.04
-  container: quay.io/pypa/manylinux_2_28_x86_64:latest
+    vmImage: macOS-11
   variables:
-    interpreter: python3.10
-    path: /home/vsts_azpcontainer/.local/bin:/home/vsts_azpcontainer/.cargo/bin:/opt/python/cp310-cp310/bin:/opt/rh/gcc-toolset-11/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    target: x86_64-unknown-linux-gnu
-    toolchain: 1.57.0
+    interpreter: python3.12
+    macosx_deployment_target: '10.15'
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.12.0'
+      addToPath: true
+      allowUnstable: true
   - checkout: self
-  - template: ./azure-sdist.yml
+  - template: ./azure-macos.yml
 
-- job: linux_debug
+- job: macos_python311_univeral2
   pool:
-    vmImage: ubuntu-22.04
-  container: quay.io/pypa/manylinux_2_28_x86_64:latest
+    vmImage: macOS-11
   variables:
-    interpreter: python3.10
-    compatibility: off
-    path: /home/vsts_azpcontainer/.local/bin:/home/vsts_azpcontainer/.cargo/bin:/opt/python/cp310-cp310/bin:/opt/rh/gcc-toolset-11/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    interpreter: python3.11
+    macosx_deployment_target: '10.15'
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.11.4'
+      addToPath: true
+      allowUnstable: true
   - checkout: self
-  - template: ./azure-debug.yml
+  - template: ./azure-macos.yml
 
-- job: macos_python310_amd64
+- job: macos_python310_univeral2
   pool:
     vmImage: macOS-11
   variables:
     interpreter: python3.10
+    macosx_deployment_target: '10.15'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -41,11 +47,12 @@ jobs:
   - checkout: self
   - template: ./azure-macos.yml
 
-- job: macos_python39_amd64
+- job: macos_python39_univeral2
   pool:
     vmImage: macOS-11
   variables:
     interpreter: python3.9
+    macosx_deployment_target: '10.15'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -54,11 +61,12 @@ jobs:
   - checkout: self
   - template: ./azure-macos.yml
 
-- job: macos_python38_amd64
+- job: macos_python38_univeral2
   pool:
     vmImage: macOS-11
   variables:
     interpreter: python3.8
+    macosx_deployment_target: '10.15'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -67,29 +75,50 @@ jobs:
   - checkout: self
   - template: ./azure-macos.yml
 
-- job: macos_python37_amd64
+- job: win_python312_amd64
   pool:
-    vmImage: macOS-11
+    vmImage: windows-2022
   variables:
-    interpreter: python3.7
+    interpreter: C:\hostedtoolcache\windows\Python\3.12.0\x64\python.exe
+    rustup: https://win.rustup.rs/x86_64
+    target: x86_64-pc-windows-msvc
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.7'
+      versionSpec: '3.12.0'
       addToPath: true
+      allowUnstable: true
+      architecture: 'x64'
   - checkout: self
-  - template: ./azure-macos.yml
+  - template: ./azure-win.yml
+
+- job: win_python311_amd64
+  pool:
+    vmImage: windows-2022
+  variables:
+    interpreter: C:\hostedtoolcache\windows\Python\3.11.4\x64\python.exe
+    rustup: https://win.rustup.rs/x86_64
+    target: x86_64-pc-windows-msvc
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.11.4'
+      addToPath: true
+      architecture: 'x64'
+  - checkout: self
+  - template: ./azure-win.yml
 
 - job: win_python310_amd64
   pool:
     vmImage: windows-2022
   variables:
-    interpreter: C:\hostedtoolcache\windows\Python\3.10.5\x64\python.exe
+    interpreter: C:\hostedtoolcache\windows\Python\3.10.8\x64\python.exe
+    rustup: https://win.rustup.rs/x86_64
     target: x86_64-pc-windows-msvc
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.10'
+      versionSpec: '3.10.8'
       addToPath: true
       architecture: 'x64'
   - checkout: self
@@ -100,11 +129,12 @@ jobs:
     vmImage: windows-2022
   variables:
     interpreter: C:\hostedtoolcache\windows\Python\3.9.13\x64\python.exe
+    rustup: https://win.rustup.rs/x86_64
     target: x86_64-pc-windows-msvc
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.9'
+      versionSpec: '3.9.13'
       addToPath: true
       architecture: 'x64'
   - checkout: self
@@ -115,27 +145,93 @@ jobs:
     vmImage: windows-2022
   variables:
     interpreter: C:\hostedtoolcache\windows\Python\3.8.10\x64\python.exe
+    rustup: https://win.rustup.rs/x86_64
     target: x86_64-pc-windows-msvc
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.8'
+      versionSpec: '3.8.10'
       addToPath: true
       architecture: 'x64'
   - checkout: self
   - template: ./azure-win.yml
 
-- job: win_python37_amd64
+- job: win_python312_x86
   pool:
     vmImage: windows-2022
   variables:
-    interpreter: C:\hostedtoolcache\windows\Python\3.7.9\x64\python.exe
-    target: x86_64-pc-windows-msvc
+    interpreter: C:\hostedtoolcache\windows\Python\3.12.0\x86\python.exe
+    rustup: https://win.rustup.rs/x86
+    target: i686-pc-windows-msvc
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.7'
+      versionSpec: '3.12.0'
       addToPath: true
-      architecture: 'x64'
+      allowUnstable: true
+      architecture: 'x86'
+  - checkout: self
+
+- job: win_python311_x86
+  pool:
+    vmImage: windows-2022
+  variables:
+    interpreter: C:\hostedtoolcache\windows\Python\3.11.4\x86\python.exe
+    rustup: https://win.rustup.rs/x86
+    target: i686-pc-windows-msvc
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.11.4'
+      addToPath: true
+      architecture: 'x86'
+  - checkout: self
+  - template: ./azure-win.yml
+
+- job: win_python310_x86
+  pool:
+    vmImage: windows-2022
+  variables:
+    interpreter: C:\hostedtoolcache\windows\Python\3.10.8\x86\python.exe
+    rustup: https://win.rustup.rs/x86
+    target: i686-pc-windows-msvc
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.10.8'
+      addToPath: true
+      architecture: 'x86'
+  - checkout: self
+  - template: ./azure-win.yml
+
+- job: win_python39_x86
+  pool:
+    vmImage: windows-2022
+  variables:
+    interpreter: C:\hostedtoolcache\windows\Python\3.9.13\x86\python.exe
+    rustup: https://win.rustup.rs/x86
+    target: i686-pc-windows-msvc
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.9.13'
+      addToPath: true
+      architecture: 'x86'
+  - checkout: self
+  - template: ./azure-win.yml
+
+- job: win_python38_x86
+  pool:
+    vmImage: windows-2022
+  variables:
+    interpreter: C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe
+    rustup: https://win.rustup.rs/x86
+    target: i686-pc-windows-msvc
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8.10'
+      addToPath: true
+      architecture: 'x86'
   - checkout: self
   - template: ./azure-win.yml

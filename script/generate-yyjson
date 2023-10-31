@@ -16,12 +16,10 @@ bindgen \
     --allowlist-function=yyjson_doc_free \
     --allowlist-function=yyjson_read_opts \
     --allowlist-type=yyjson_alc \
-    --allowlist-type=yyjson_arr_iter \
     --allowlist-type=yyjson_doc \
-    --allowlist-type=yyjson_obj_iter \
     --allowlist-type=yyjson_read_code \
     --allowlist-type=yyjson_read_err \
     --allowlist-type=yyjson_val \
     --allowlist-var=YYJSON_READ_NOFLAG \
     --allowlist-var=YYJSON_READ_SUCCESS \
-    > "${_repo}/src/yyjson.rs"
+    > "${_repo}/src/ffi/yyjson.rs"

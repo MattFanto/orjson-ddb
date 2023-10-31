@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-use crate::ffi::PyBytesObject;
-use pyo3_ffi::*;
-use serde_json::WriteExt;
+use pyo3_ffi::{
+    PyBytesObject, PyBytes_FromStringAndSize, PyObject, PyVarObject, Py_ssize_t, _PyBytes_Resize,
+};
 use std::os::raw::c_char;
 use std::ptr::NonNull;
 
@@ -26,12 +26,16 @@ impl BytesWriter {
         }
     }
 
+    pub fn bytes_ptr(&mut self) -> NonNull<PyObject> {
+        unsafe { NonNull::new_unchecked(self.bytes as *mut PyObject) }
+    }
+
     pub fn finish(&mut self) -> NonNull<PyObject> {
         unsafe {
             std::ptr::write(self.buffer_ptr(), 0);
             (*self.bytes.cast::<PyVarObject>()).ob_size = self.len as Py_ssize_t;
             self.resize(self.len);
-            NonNull::new_unchecked(self.bytes as *mut PyObject)
+            self.bytes_ptr()
         }
     }
 
@@ -44,6 +48,7 @@ impl BytesWriter {
         }
     }
 
+    #[inline]
     pub fn resize(&mut self, len: usize) {
         self.cap = len;
         unsafe {
@@ -54,6 +59,7 @@ impl BytesWriter {
         }
     }
 
+    #[cold]
     #[inline(never)]
     fn grow(&mut self, len: usize) {
         let mut cap = self.cap;
@@ -77,11 +83,11 @@ impl std::io::Write for BytesWriter {
     fn write_all(&mut self, buf: &[u8]) -> Result<(), std::io::Error> {
         let to_write = buf.len();
         let end_length = self.len + to_write;
-        if unlikely!(end_length > self.cap) {
+        if unlikely!(end_length >= self.cap) {
             self.grow(end_length);
         }
         unsafe {
-            std::ptr::copy_nonoverlapping(buf.as_ptr() as *const u8, self.buffer_ptr(), to_write);
+            std::ptr::copy_nonoverlapping(buf.as_ptr(), self.buffer_ptr(), to_write);
         };
         self.len = end_length;
         Ok(())
@@ -92,32 +98,120 @@ impl std::io::Write for BytesWriter {
     }
 }
 
+// hack based on saethlin's research and patch in https://github.com/serde-rs/json/issues/766
+pub trait WriteExt: std::io::Write {
+    #[inline]
+    fn as_mut_buffer_ptr(&mut self) -> *mut u8 {
+        std::ptr::null_mut()
+    }
+
+    #[inline]
+    fn reserve(&mut self, len: usize) {
+        let _ = len;
+    }
+
+    #[inline]
+    fn set_written(&mut self, len: usize) {
+        let _ = len;
+    }
+
+    #[inline]
+    fn write_str(&mut self, val: &str) -> std::result::Result<(), std::io::Error> {
+        let _ = val;
+        Ok(())
+    }
+
+    #[inline]
+    unsafe fn write_reserved_fragment(
+        &mut self,
+        val: &[u8],
+    ) -> std::result::Result<(), std::io::Error> {
+        let _ = val;
+        Ok(())
+    }
+
+    #[inline]
+    unsafe fn write_reserved_punctuation(
+        &mut self,
+        val: u8,
+    ) -> std::result::Result<(), std::io::Error> {
+        let _ = val;
+        Ok(())
+    }
+
+    #[inline]
+    unsafe fn write_reserved_indent(
+        &mut self,
+        len: usize,
+    ) -> std::result::Result<(), std::io::Error> {
+        let _ = len;
+        Ok(())
+    }
+}
+
 impl WriteExt for &mut BytesWriter {
+    #[inline(always)]
+    fn as_mut_buffer_ptr(&mut self) -> *mut u8 {
+        self.buffer_ptr()
+    }
+
+    #[inline(always)]
+    fn reserve(&mut self, len: usize) {
+        let end_length = self.len + len;
+        if unlikely!(end_length >= self.cap) {
+            self.grow(end_length);
+        }
+    }
+
+    #[inline(always)]
+    fn set_written(&mut self, len: usize) {
+        self.len += len;
+    }
+
     fn write_str(&mut self, val: &str) -> Result<(), std::io::Error> {
         let to_write = val.len();
         let end_length = self.len + to_write + 2;
-        if unlikely!(end_length > self.cap) {
+        if unlikely!(end_length >= self.cap) {
             self.grow(end_length);
         }
         unsafe {
             let ptr = self.buffer_ptr();
             std::ptr::write(ptr, b'"');
-            std::ptr::copy_nonoverlapping(val.as_ptr() as *const u8, ptr.add(1), to_write);
+            std::ptr::copy_nonoverlapping(val.as_ptr(), ptr.add(1), to_write);
             std::ptr::write(ptr.add(to_write + 1), b'"');
         };
         self.len = end_length;
         Ok(())
     }
 
-    fn write_indent(&mut self, len: usize) -> Result<(), std::io::Error> {
-        let end_length = self.len + len;
-        if unlikely!(end_length > self.cap) {
-            self.grow(end_length);
-        }
+    unsafe fn write_reserved_fragment(
+        &mut self,
+        val: &[u8],
+    ) -> std::result::Result<(), std::io::Error> {
+        let to_write = val.len();
+        unsafe {
+            std::ptr::copy_nonoverlapping(val.as_ptr(), self.buffer_ptr(), to_write);
+        };
+        self.len += to_write;
+        Ok(())
+    }
+
+    #[inline(always)]
+    unsafe fn write_reserved_punctuation(
+        &mut self,
+        val: u8,
+    ) -> std::result::Result<(), std::io::Error> {
+        unsafe { std::ptr::write(self.buffer_ptr(), val) };
+        self.len += 1;
+        Ok(())
+    }
+
+    #[inline(always)]
+    unsafe fn write_reserved_indent(&mut self, len: usize) -> Result<(), std::io::Error> {
         unsafe {
             std::ptr::write_bytes(self.buffer_ptr(), b' ', len);
         };
-        self.len = end_length;
+        self.len += len;
         Ok(())
     }
 }

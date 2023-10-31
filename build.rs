@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+use std::env;
+
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=include/yyjson/*");
@@ -7,7 +9,6 @@ fn main() {
     println!("cargo:rerun-if-env-changed=CFLAGS");
     println!("cargo:rerun-if-env-changed=LDFLAGS");
     println!("cargo:rerun-if-env-changed=RUSTFLAGS");
-    println!("cargo:rerun-if-env-changed=ORJSON_ENABLE_PYDICTITER");
     println!("cargo:rerun-if-env-changed=ORJSON_DISABLE_YYJSON");
 
     let py_cfg = pyo3_build_config::get();
@@ -21,27 +22,33 @@ fn main() {
         println!("cargo:rustc-cfg=feature=\"optimize\"");
     }
 
-    if std::env::var("ORJSON_ENABLE_PYDICTITER").is_ok() {
-        println!("cargo:rustc-cfg=feature=\"pydictiter\"");
+    if let Some(true) = version_check::supports_feature("strict_provenance") {
+        println!("cargo:rustc-cfg=feature=\"strict_provenance\"");
     }
 
-    if std::env::var("ORJSON_DISABLE_YYJSON").is_ok() {
-        if std::env::var("CARGO_FEATURE_YYJSON").is_ok() {
+    if let Some(true) = version_check::supports_feature("trusted_len") {
+        println!("cargo:rustc-cfg=feature=\"trusted_len\"");
+    }
+
+    if env::var("ORJSON_DISABLE_YYJSON").is_ok() {
+        if env::var("CARGO_FEATURE_YYJSON").is_ok() {
             panic!("ORJSON_DISABLE_YYJSON and --features=yyjson both enabled.")
         }
     } else {
         match cc::Build::new()
             .file("include/yyjson/yyjson.c")
             .include("include/yyjson")
-            .define("YYJSON_DISABLE_WRITER", "1")
             .define("YYJSON_DISABLE_NON_STANDARD", "1")
+            .define("YYJSON_DISABLE_UTF8_VALIDATION", "1")
+            .define("YYJSON_DISABLE_UTILS", "1")
+            .define("YYJSON_DISABLE_WRITER", "1")
             .try_compile("yyjson")
         {
             Ok(_) => {
                 println!("cargo:rustc-cfg=feature=\"yyjson\"");
             }
             Err(_) => {
-                if std::env::var("CARGO_FEATURE_YYJSON").is_ok() {
+                if env::var("CARGO_FEATURE_YYJSON").is_ok() {
                     panic!("yyjson was enabled but the build failed. To build with a different backend do not specify the feature.")
                 }
             }
