@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import io
+import sys
 
 import pytest
 
@@ -31,7 +32,7 @@ class TestType:
         """
         str
         """
-        for (obj, ref) in (("blah", b'"blah"'), ("東京", b'"\xe6\x9d\xb1\xe4\xba\xac"')):
+        for obj, ref in (("blah", b'"blah"'), ("東京", b'"\xe6\x9d\xb1\xe4\xba\xac"')):
             assert orjson.dumps(obj) == ref
             assert orjson.loads(ref) == obj
 
@@ -61,6 +62,95 @@ class TestType:
         """
         assert orjson.dumps("�") == b'"\xef\xbf\xbd"'
         assert orjson.loads(b'"\xef\xbf\xbd"') == "�"
+
+    def test_str_trailing_4_byte(self):
+        ref = "うぞ〜😏🙌"
+        assert orjson.loads(orjson.dumps(ref)) == ref
+
+    def test_str_ascii_control(self):
+        """
+        worst case format_escaped_str_with_escapes() allocation
+        """
+        ref = "\x01\x1F" * 1024 * 16
+        assert orjson.loads(orjson.dumps(ref)) == ref
+        assert orjson.loads(orjson.dumps(ref, option=orjson.OPT_INDENT_2)) == ref
+
+    def test_str_escape_0(self):
+        assert orjson.dumps('"aaaaaaabb') == b'"\\"aaaaaaabb"'
+
+    def test_str_escape_1(self):
+        assert orjson.dumps('a"aaaaaabb') == b'"a\\"aaaaaabb"'
+
+    def test_str_escape_2(self):
+        assert orjson.dumps('aa"aaaaabb') == b'"aa\\"aaaaabb"'
+
+    def test_str_escape_3(self):
+        assert orjson.dumps('aaa"aaaabb') == b'"aaa\\"aaaabb"'
+
+    def test_str_escape_4(self):
+        assert orjson.dumps('aaaa"aaabb') == b'"aaaa\\"aaabb"'
+
+    def test_str_escape_5(self):
+        assert orjson.dumps('aaaaa"aabb') == b'"aaaaa\\"aabb"'
+
+    def test_str_escape_6(self):
+        assert orjson.dumps('aaaaaa"abb') == b'"aaaaaa\\"abb"'
+
+    def test_str_escape_7(self):
+        assert orjson.dumps('aaaaaaa"bb') == b'"aaaaaaa\\"bb"'
+
+    def test_str_escape_8(self):
+        assert orjson.dumps('aaaaaaaab"') == b'"aaaaaaaab\\""'
+
+    def test_str_emoji(self):
+        ref = "®️"
+        assert orjson.loads(orjson.dumps(ref)) == ref
+
+    def test_str_emoji_escape(self):
+        ref = '/"®️/"'
+        assert orjson.loads(orjson.dumps(ref)) == ref
+
+    def test_very_long_list(self):
+        orjson.dumps([[]] * 1024 * 16)
+
+    def test_very_long_list_pretty(self):
+        orjson.dumps([[]] * 1024 * 16, option=orjson.OPT_INDENT_2)
+
+    def test_very_long_dict(self):
+        orjson.dumps([{}] * 1024 * 16)
+
+    def test_very_long_dict_pretty(self):
+        orjson.dumps([{}] * 1024 * 16, option=orjson.OPT_INDENT_2)
+
+    def test_very_long_str_empty(self):
+        orjson.dumps([""] * 1024 * 16)
+
+    def test_very_long_str_empty_pretty(self):
+        orjson.dumps([""] * 1024 * 16, option=orjson.OPT_INDENT_2)
+
+    def test_very_long_str_not_empty(self):
+        orjson.dumps(["a"] * 1024 * 16)
+
+    def test_very_long_str_not_empty_pretty(self):
+        orjson.dumps(["a"] * 1024 * 16, option=orjson.OPT_INDENT_2)
+
+    def test_very_long_bool(self):
+        orjson.dumps([True] * 1024 * 16)
+
+    def test_very_long_bool_pretty(self):
+        orjson.dumps([True] * 1024 * 16, option=orjson.OPT_INDENT_2)
+
+    def test_very_long_int(self):
+        orjson.dumps([(2**64) - 1] * 1024 * 16)
+
+    def test_very_long_int_pretty(self):
+        orjson.dumps([(2**64) - 1] * 1024 * 16, option=orjson.OPT_INDENT_2)
+
+    def test_very_long_float(self):
+        orjson.dumps([sys.float_info.max] * 1024 * 16)
+
+    def test_very_long_float_pretty(self):
+        orjson.dumps([sys.float_info.max] * 1024 * 16, option=orjson.OPT_INDENT_2)
 
     def test_str_surrogates_loads(self):
         """
@@ -136,7 +226,7 @@ class TestType:
         """
         bool
         """
-        for (obj, ref) in ((True, "true"), (False, "false")):
+        for obj, ref in ((True, "true"), (False, "false")):
             assert orjson.dumps(obj) == ref.encode("utf-8")
             assert orjson.loads(ref) == obj
 

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+yyjson_version="5e3b26d2659287d31e2f8e10f95f95feb7e5ab3a"
+
+curl -Ls -o include/yyjson/yyjson.c "https://raw.githubusercontent.com/ibireme/yyjson/${yyjson_version}/src/yyjson.c"
+curl -Ls -o include/yyjson/yyjson.h "https://raw.githubusercontent.com/ibireme/yyjson/${yyjson_version}/src/yyjson.h"
+
+sed -i 's/yyjson_api_inline void yyjson_doc_free/yyjson_api void yyjson_doc_free/g' include/yyjson/yyjson.h
+
+sed -i 's/(flg & (YYJSON_READ_NUMBER_AS_RAW | YYJSON_READ_BIGNUM_AS_RAW)) != 0/false/g' include/yyjson/yyjson.c
+sed -i 's/if (pre)/if (false)/g' include/yyjson/yyjson.c
+
+sed -i 's/!false/true/g' include/yyjson/yyjson.c
+sed -i 's/ && true//g' include/yyjson/yyjson.c
+sed -i 's/true && //g' include/yyjson/yyjson.c
+sed -i 's/unlikely(false)/false/g' include/yyjson/yyjson.c
+
+sed -i 's/YYJSON_TYPE_STR | YYJSON_SUBTYPE_NOESC/YYJSON_TYPE_STR/g' include/yyjson/yyjson.c
+
+sed -i 's/unlikely(pos == src)/false/g' include/yyjson/yyjson.c
+
+sed -i 's/    yyjson_read_err dummy_err;//g' include/yyjson/yyjson.c
+sed -i 's/    if (!err) err = &dummy_err;//g' include/yyjson/yyjson.c
+sed -i 's/likely(!alc_ptr)/!alc_ptr/g' include/yyjson/yyjson.c
+
+sed -i 's/unlikely(read_flag_eq(flg, YYJSON_READ_##_flag))/false/g' include/yyjson/yyjson.c
