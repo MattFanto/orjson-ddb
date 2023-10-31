@@ -14,15 +14,15 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         target: [x64, x86]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.target }}
 
       - name: Build wheels
-        uses: messense/maturin-action@v1
+        uses: PyO3/maturin-action@v1
         with:
           maturin-version: v1.3.1
           target: ${{ matrix.target }}
@@ -35,7 +35,7 @@ jobs:
           pip install orjson_ddb --no-index --find-links dist/ --force-reinstall
           python -m pytest -s -rxX -v test
       - name: Upload wheels
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: dist
@@ -46,11 +46,11 @@ jobs:
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [ windows ]
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: wheels
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
       - run: pip install "maturin>=1,<2"
