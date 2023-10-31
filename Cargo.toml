@@ -5,7 +5,7 @@ authors = ["Mattia Fantoni <mattia.fantoni@gmail.com>"]
 description = "Fast Python ser/des for DynamoDB native JSON format"
 edition = "2021"
 resolver = "2"
-rust-version = "1.57"
+rust-version = "1.65"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/MattFanto/orjson-ddb"
 homepage = "https://github.com/MattFanto/orjson-ddb"
@@ -28,29 +28,6 @@ include = [
 [lib]
 name = "orjson_ddb"
 crate-type = ["cdylib"]
-
-[package.metadata.maturin]
-requires-python = ">=3.7"
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: MacOS",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python",
-    "Programming Language :: Rust",
-    "Typing :: Typed",
-]
-python-source = "python"
 
 [features]
 default = []
