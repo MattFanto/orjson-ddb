@@ -182,7 +182,7 @@ class TestMemory:
             val = orjson.dumps(fixture, default=default)
             assert val
         gc.collect()
-    assert proc.memory_info().rss <= mem + MAX_INCREASE
+        assert proc.memory_info().rss <= mem + MAX_INCREASE
 
     @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_dumps_dataclass(self):
