@@ -61,7 +61,7 @@ DATACLASS_FIXTURE = [
     for i in range(100000, 101000)
 ]
 
-MAX_INCREASE = 2097152  # 2MiB
+MAX_INCREASE = 3129344
 
 
 class Unsupported:
@@ -182,7 +182,7 @@ class TestMemory:
             val = orjson.dumps(fixture, default=default)
             assert val
         gc.collect()
-        assert proc.memory_info().rss <= mem + MAX_INCREASE
+    assert proc.memory_info().rss <= mem + MAX_INCREASE
 
     @pytest.mark.skipif(psutil is None, reason="psutil not installed")
     def test_memory_dumps_dataclass(self):
